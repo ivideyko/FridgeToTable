@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>What's in Your Fridge?</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+  <link rel="stylesheet" href="assets/css/styles.css">
+
+</head>
+<body>
+  <h1>What's in Your Fridge?</h1>
+  <form>
+    <input type="text" id="input-ingredient">
+    <button type="submit" id="add-ingredient" class="btn btn-default">Add Ingredient</button>
+  </form>
+    <div id="ingredient-list">
+
+    </div>
+    <br><br>
+    <!-- <button id="find-recipes" class="btn btn-default">Find Recipes</button>
+    <br><br> -->
+
+    <div id="recipe-list"></div>
+
+  <script>
+  $(document).ready(function(){
+    var appId = "a14e56b9";
+    var appKey = "f8fa949610a90e86f7508bbf80978218";
+    // var appId = "8666c2e4";
+    // var appKey = "5e7ed41f54702cd0b4a05804a1699162";
+    var searchTerms = [];
+    var searchString = "";
+
+    function displayIngredients() {
+
+      console.log(searchTerms);
+      // render our searchTerms todos to the page
+      $("#ingredient-list").empty();
+
+      for (var i = 0; i < searchTerms.length; i++) {
+        var p = $("<p>").text(searchTerms[i]);
+        var b = $("<button class='delete'>").text("x").attr("data-index", i);
+        p.prepend(b);
+        $("#ingredient-list").prepend(p);
+      }
+    }
+
+    function recipeSearch () {
+      searchString = "";
+
+      if (searchTerms.length === 0) {
+        $("#recipe-list").empty();
+        return false;
+      }
+
+      for (var i = 0; i < searchTerms.length; i++) {
+        searchString = searchString + searchTerms[i] + "+";
+      }
+
+      var queryURL = "https://api.yummly.com/v1/api/recipes?" +
+          "q=" + searchString + 
+          "&_app_id=" + appId +
+          "&_app_key=" + appKey +
+          "&requirePictures=true";
+
+      $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).then(function(response) {
+        
+        console.log(response);
+        console.log(response.matches.length);
+
+        $("#recipe-list").empty();
+        for (var j = 0; j < response.matches.length; j++) {
+          var recipeDiv = $("<div>");
+          var recipeTitle = $("<div>");
+          recipeDiv.text(response.matches[j].recipeName);
+          
+          var image = $("<img>");
+          image.attr("src", response.matches[j].smallImageUrls[0]);
+          recipeDiv.append(recipeTitle).append(image);
+          
+          recipeDiv.attr("id", response.matches[j].id)
+          $("#recipe-list").append(recipeDiv);
+        }
+      });
+    }
+
+    $(document).on("click", "button.delete", function(){
+      event.preventDefault();
+      var currentIndex = $(this).attr("data-index");
+
+      // Deletes the item marked for deletion
+      searchTerms.splice(currentIndex, 1);
+
+      displayIngredients();
+      recipeSearch();
+    });
+
+    $("#add-ingredient").on("click", function(){
+      event.preventDefault();
+      var ingredient = $("#input-ingredient").val().trim()
+      if(ingredient){
+        searchTerms.push(ingredient);
+        $("#input-ingredient").val("");
+        displayIngredients();
+        recipeSearch();
+      }
+    });
+
+    // $("#find-recipes").on("click", function(){
+    //   event.preventDefault();
+    //   recipeSearch();
+    // });
+  });
+  </script>
+</body>
+</html>

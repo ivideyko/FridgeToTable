@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>What's in Your Fridge?</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" media="screen" href="assets/style.css">
+
+</head>
+<body>
+  <h1>What's in Your Fridge?</h1>
+
+    <input type="text" id="ingredient">
+    <button type="submit" id="add-ingredient" class="btn btn-default">Add Ingredient</button>
+    
+    <div id="ingredients" class="row">
+      <ul id="ingredients-list">
+        
+      </ul>
+
+    </div>
+    <br><br>
+    <button type="submit" id="find-recipes" class="btn btn-default">Find Recipes</button>
+
+    <div id="display-search-results">
+
+    </div>
+    <!-- <div id="display-images">
+    </div>
+    <div id="display-url">
+    </div> -->
+
+  <script>
+  $(document).ready(function(){
+    // Edamam API
+    var appId = "8666c2e4";
+    var appKey = "5e7ed41f54702cd0b4a05804a1699162";
+    var searchTerms = [];
+    var searchString = "";
+  // Choppingboard API
+    var chopURL = "https://choppingboard.recipes/api/v0/recipe?key=";
+    var chopKey = "616a792487dea73d933609aaa6e40ea0";
+    var chopIngr = [];
+    
+    $("#add-ingredient").on("click", function(event){
+      event.preventDefault();
+      searchTerms.push($("#ingredient").val().trim());
+      chopIngr.push($("#ingredient").val().trim());
+      var div = $("<div>");
+      $("#ingredients-list").append("<li>" + $("#ingredient").val().trim() + "</li>");
+      
+    });
+    $("#find-recipes").on("click", function(){
+      // for (var i = 0; i < searchTerms.length; i++) {
+      //   searchString = searchString + searchTerms[i] + ",";
+      // }
+      // console.log(searchString);
+      // var searchTerm = $(this).attr("data-search");
+      var queryURL = "https://api.edamam.com/search?" +
+          "q=" + searchTerms.toString() + 
+          "&app_id=" + appId +
+          "&app_key=" + appKey;
+      $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).then(function(response) {
+        console.log(response);
+        var results = response.hits;
+        // var recipeURL = response.hits[0].recipe.url;
+        for (var i = 0; i < results.length; i++) {
+          var image = $("<img>");
+          var link = $("<a>");
+          var row = $("<div class='row'>");
+          var col = $("<div class='col-sm-6 col-md-4'>");
+          var pic =  $("<div class='thumbnail'>");
+          var cap = $("<div class='caption'>")
+          var header = $("<h3>");
+          var parag = $("<p>");
+          var btn = $("<button class='btn btn-primary>");
+          var dish = results[i].recipe.label;
+          var edamamRecipeURL = results[i].recipe.url;
+          image.attr("src", results[i].recipe.image);
+          link.attr("href", results[i].recipe.url);
+          var image2 = results[i].recipe.image;
+          $("#display-search-results").append("<div class='col-sm-6 col-md-4'>" + 
+                                                  "<div class='thumbnail'>" + 
+                                                    "<img src='" + image2 + "'>" + 
+                                                    "<div class='caption'>" + 
+                                                      "<h3>" + dish + "</h3>" + 
+                                                      "<button class='btn btn-primary recipe' value='" + edamamRecipeURL + "'>Recipe</button>" +
+                                                    "</div>" +
+                                                  "</div>" +
+                                                "</div>");
+                                                console.log(edamamRecipeURL);
+        }
+        console.log(edamamRecipeURL);
+        $(".recipe").on("click", function(){
+          console.log(edamamRecipeURL);
+          var chopQueryURL = chopURL + chopKey + "&q=" + $(this).prop("value");
+          $.ajax({
+            url: chopQueryURL,
+            method: "GET"
+          }).then(function(values){
+            console.log(values);
+          });
+        });
+      });
+    });
+  });
+  </script>
+</body>
+</html>
