@@ -3,6 +3,9 @@ $(document).ready(function(){
   var appId = "8666c2e4";
   var appKey = "5e7ed41f54702cd0b4a05804a1699162";
 
+  var chopKey = "743b5dc1e2f7b89e78a3875425eac486";
+  var chopUrl = "https://choppingboard.recipes/api/v0/recipe?key=";
+
   var searchTerms = [];
   var searchString = "";
 
@@ -74,26 +77,26 @@ $(document).ready(function(){
         var ingredients = $('<p class="card-text">');
         var ul = $("<ul>");
         var footer = $('<div class="card-footer">' +
-              '<button type="submit" class="get-instructions btn btn-primary" ' + 
-              'href="' + results[j].recipe.url + '" target="_blank">Instructions</button>' +
-              '<button type="submit" class="save-recipe btn btn-primary" data-toggle="modal" ' + 'data-target="#exampleModal">Save Recipe</button>'
+              '<button type="submit" class="get-instructions btn btn-primary" data-toggle="modal" data-target="#exampleModal" ' + 
+              'value="' + results[j].recipe.url + '">Instructions</button>' +
+              '<button type="submit" class="save-recipe btn btn-primary"  ' + 
+              'value="' + results[j].recipe.url + '" ' + 
+              '>Save Recipe</button>'
             );
+ 
+        var modal = $('<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="exampleModalLabel">Recipe Instructions</h5><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body">...</div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button><button type="button" class="btn btn-primary">Save </button></div></div></div>');
 
         // Display recipe ingredients
         for (var i = 0; i < results[j].recipe.ingredientLines.length; i++) {
           var li = $("<li>");
           li.text(results[j].recipe.ingredientLines[i]);
-          // Strike searched ingredients
-          for (var k = 0; k < searchTerms.length; k++) {
-            if (new RegExp(searchTerms[k]).test(results[j].recipe.ingredientLines[i])) {
-              li.css("text-decoration-line", "line-through");
-            }
-          }
           ul.append(li);
         }
+
         // Build recipe bootstrap card
         ingredients.append(ul);
         cardBody.append(title).append(ingredients);
+        footer.append(modal);
         card.append(image).append(cardBody).append(footer);
         col.append(card);
         row.append(col);
@@ -105,54 +108,7 @@ $(document).ready(function(){
           recipeList.append(row);
           row = $('<div class="row">');
           colCount = 0;
-        }
-
-        // if (results[j].smallImageUrls) {
-        // var recipeDiv = $("<div>");
-        // var recipeTitle = $("<div>");
-        // var recipeImage = $("<img>");
-        // var recipeIngredients = $("<div>");
-        // var recipeInstructions = $("<div>");
-
-        // var ul = $("<ul>");
-
-        // for (var i = 0; i < results[j].recipe.ingredientLines.length; i++) {
-        //   // console.log(results[j].ingredients[i]);
-        //   var li = $("<li>");
-        //   // var b = $("<button>")
-        //   //     .attr("type", "button")
-        //   //     .attr("class", "btn btn-primary")
-        //   //     .text(results[j].recipe.ingredientLines[i]);
-
-        //   // li.append(b);
-
-        //     for (var k = 0; k < searchTerms.length; k++) {
-        //       if (new RegExp(searchTerms[k]).test(results[j].recipe.ingredientLines[i])) {
-        //         li.css("text-decoration-line", "line-through");
-        //       }
-        //     }
-
-        //   ul.append(li);
-          // }
-
-        //   recipeIngredients.append(ul);
-
-        //   recipeImage.attr("class", "recipe-image");
-        //   recipeImage.attr("data-id", results[j].recipe.label);
-        //   recipeImage.attr("src", results[j].recipe.image);
-
-        //   recipeTitle.text(results[j].recipe.label);
-        //   recipeTitle.attr("class", "recipe-title");
-        //   recipeTitle.attr("data-id", results[j].id);
-
-        //   // recipeInstructions.text(results[j].id);
-        //   // recipeInstructions.attr("data-id", results[j].id);
-        //   // recipeInstructions.text(getRecipe(results[j].recipe.label);
-
-        //   recipeDiv.append(recipeTitle).append(recipeImage).append(recipeIngredients).append(recipeInstructions);
-          
-        //   $("#recipe-list").append(recipeDiv);
-        
+        }        
       }
     });
   }
@@ -192,6 +148,23 @@ $(document).ready(function(){
     searchTerms.splice(currentIndex, 1);
     displayIngredients();
     findRecipes();
+  });
+
+  $(document).on("click", ".get-instructions, .save-recipe", function(){
+    var chopQueryURL = chopUrl + chopKey + "&q=" + $(this).prop("value");
+    $.ajax({
+      url: chopQueryURL,
+      method: "GET"
+    }).then(function(values){
+      var ul = $("<ul>");
+      for (var i = 0; i < values.instructions.length; i++) {
+        var li = $("<li>");
+        li.text(values.instructions[i]);
+        ul.append(li);
+      }
+      $(".modal-body").empty();
+      $(".modal-body").append(ul);
+    });
   });
 
   $("#add-ingredient").on("click", function(){
