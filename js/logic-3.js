@@ -3,7 +3,7 @@ $(document).ready(function(){
   var appId = "8666c2e4";
   var appKey = "5e7ed41f54702cd0b4a05804a1699162";
 
-  var chopKey = "743b5dc1e2f7b89e78a3875425eac486";
+  var chopKey = "616a792487dea73d933609aaa6e40ea0";
   var chopUrl = "https://choppingboard.recipes/api/v0/recipe?key=";
 
   var searchTerms = [];
@@ -112,32 +112,6 @@ $(document).ready(function(){
       }
     });
   }
-
-  // function getRecipe(recipe) {
-  //   var recipeUrl = "";
-
-  //   var queryURL = "https://api.yummly.com/v1/api/recipe/" + recipe + "?" +
-  //         "_app_id=" + appId +
-  //         "&_app_key=" + appKey;
-
-  //   $.ajax({
-  //     url: queryURL,
-  //     method: "GET"
-  //   }).then(function(recipeResponse) {
-  //     recipeUrl = recipeResponse.source.sourceRecipeUrl;  
-  //     console.log(recipeUrl);
-  //     return (recipeUrl);
-  //   });
-  // }
-
-  // $(document).on("click", "recipeImage recipeTitle", function(){
-  //   // event.preventDefault();
-  //   var currentRecipe = $(this).attr("data-id");
-  //   searchTerms.splice(currentIndex, 1);
-  //   displayIngredients();
-  //   findRecipes();
-  // });
-
 
   //////////////////////////////////////////////////////////////////////////
   //  EVENT HANDLERS
